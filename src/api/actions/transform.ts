@@ -1,30 +1,44 @@
-import childProcess from 'child_process';
+import fs from 'fs/promises';
+import jscodeshift, { Transform } from 'jscodeshift';
 import { Action } from '../types';
 
-export function transform(transformFile: string) {
+interface TransformPayload {
+	transform: Transform;
+}
+
+export function transform(transformFn: Transform) {
 	return {
 		_handler: handleTransform,
 		type: transform,
 		payload: {
-			transformFile,
+			transform: transformFn,
 		},
 	};
 }
 
-function handleTransform(action: Action, ctx?: string) {
-	return new Promise<void>((resolve, reject) => {
-		childProcess.exec(
-			`echo "transforming ${ctx} in order to ${action.payload.transformFile}"`,
-			(err, stdout) => {
-				if (err) {
-					reject(err);
-					return;
-				}
+async function handleTransform(action: Action<TransformPayload>, ctx: string) {
+	const source = await fs.readFile(ctx);
 
-				console.log(stdout);
+	if (!source) {
+		throw new Error(`Source file not found at ${ctx}`);
+	}
 
-				resolve();
-			},
-		);
-	});
+	const transformedContent = action.payload.transform(
+		{ path: ctx, source: String(source) },
+		{
+			jscodeshift,
+			j: jscodeshift,
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			report() {},
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			stats() {},
+		},
+		{},
+	);
+
+	if (typeof transformedContent !== 'string') {
+		throw new Error('No data to write to file. Expected string.');
+	}
+
+	return fs.writeFile(ctx, transformedContent);
 }
