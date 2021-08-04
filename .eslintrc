@@ -2,8 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "plugins": [
-    "@typescript-eslint",
-    "react"
+    "@typescript-eslint"
   ],
   "extends": [
     "xo",
@@ -26,6 +25,9 @@
       2,
       "after"
     ],
+    "comma-dangle": [2, "always-multiline"],
+    "guard-for-in": 0,
+    "no-await-in-loop": 0,
     "@typescript-eslint/explicit-module-boundary-types": 0,
     "@typescript-eslint/no-empty-interface": 0,
     "@typescript-eslint/no-var-requires": 0

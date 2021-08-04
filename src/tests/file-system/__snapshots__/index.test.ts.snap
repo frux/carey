@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Actions move should move file 1`] = `
+Object {
+  "/bar.tsx": "test",
+}
+`;
+
+exports[`Actions move should rename file 1`] = `
+Object {
+  "/foo/baz.txt": "test",
+}
+`;
